@@ -9,5 +9,4 @@ public class WordAnalyzerApplication {
     public static void main(String[] args) {
         SpringApplication.run(WordAnalyzerApplication.class, args);
     }
-
 }
