@@ -1,0 +1,6 @@
+POST http://localhost:8080/text-processing/highest-frequency
+Content-Type: application/json
+
+{
+  "input": "abc_abc abc abc abc# abc_dba"
+}
