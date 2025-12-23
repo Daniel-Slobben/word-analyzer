@@ -10,15 +10,19 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import slobben.wordanalyzer.WordAnalyzerApplication;
 import slobben.wordanalyzer.dto.InputRequest;
+import slobben.wordanalyzer.dto.WordFrequency;
 import slobben.wordanalyzer.dto.WordFrequencyDto;
 import tools.jackson.core.JacksonException;
+import utils.TestUtils;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = WordAnalyzerApplication.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)   // optional, lets us use constructor injection
@@ -81,5 +85,22 @@ class WordAnalyzerTests {
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).usingRecursiveComparison().isEqualTo(expectedList);
+    }
+
+    @Test
+    void tooLargeInput() throws JacksonException {
+
+        var largeString = TestUtils.getStringOfLength(10_000_001);
+        InputRequest payload = new InputRequest(largeString);
+        HttpEntity<InputRequest> request = new HttpEntity<>(payload);
+        var responseType = new ParameterizedTypeReference<List<WordFrequency>>() {};
+        // execute and verify
+        assertThatExceptionOfType(HttpClientErrorException.class).isThrownBy(() ->
+                restTemplate.exchange("http://localhost:" + port + BASE_URL + FREQUENCY_LIST,
+                        HttpMethod.POST,
+                        request,
+                        responseType,
+                        "2")
+        );
     }
 }

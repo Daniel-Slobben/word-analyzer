@@ -8,9 +8,9 @@ import org.junit.jupiter.params.provider.CsvSource;
 import slobben.wordanalyzer.dto.WordFrequency;
 import slobben.wordanalyzer.dto.WordFrequencyDto;
 import slobben.wordanalyzer.service.WordCounterService;
+import utils.TestUtils;
 
 import java.util.List;
-import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -66,19 +66,14 @@ class WordFrequencyTests {
     @Test
     void calculateLargeString() {
         // prepare
-        final int length = 10_000_000;
-        final String possibilities = "abcdABCD_@! ";
-        var largeString = new StringBuilder();
-        var random = new Random();
-        for (int i = 0; i < length; i++) {
-            largeString.append(possibilities.charAt(random.nextInt(possibilities.length())));
-        }
+        var largeString = TestUtils.getStringOfLength(10_000_000);
 
         // execute
-        var result = wordCounterService.calculateMostFrequentNWords(largeString.toString(), 10);
+        var result = wordCounterService.calculateMostFrequentNWords(largeString, 10);
         result.forEach((wf -> log.info("Word: {} Frequency: {}", wf.getWord(), wf.getFrequency())));
 
         assertThat(result).isNotEmpty();
     }
+
 
 }
