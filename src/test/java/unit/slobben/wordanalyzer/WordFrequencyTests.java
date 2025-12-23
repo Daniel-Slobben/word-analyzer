@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import slobben.wordanalyzer.dto.WordFrequency;
 import slobben.wordanalyzer.dto.WordFrequencyDto;
 import slobben.wordanalyzer.service.WordCounterService;
@@ -50,6 +51,16 @@ class WordFrequencyTests {
         assertThat(result).hasSize(amountOfUniqueWords);
     }
 
+    @ParameterizedTest
+    @NullAndEmptySource
+    void nullCheck(String testString) {
+        // execute
+        var result = wordCounterService.calculateHighestFrequency(testString);
+
+        // verify
+        assertThat(result).isZero();
+    }
+
     @Test
     void calculateMostFrequentWords() {
         // prepare
@@ -74,6 +85,4 @@ class WordFrequencyTests {
 
         assertThat(result).isNotEmpty();
     }
-
-
 }

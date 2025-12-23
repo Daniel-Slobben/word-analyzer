@@ -40,6 +40,9 @@ public class WordCounterService implements WordFrequencyAnalyzer {
     }
 
     private static Stream<WordFrequency> getWordFrequencies(String text) {
+        if (text == null || text.isEmpty()) {
+            return Stream.empty();
+        }
         return Stream.of(text.split("[^a-zA-Z]+"))
                 .parallel()
                 .map(String::toLowerCase)
