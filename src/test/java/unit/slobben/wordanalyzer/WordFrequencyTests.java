@@ -61,6 +61,16 @@ class WordFrequencyTests {
         assertThat(result).isZero();
     }
 
+    @ParameterizedTest
+    @NullAndEmptySource
+    void nullCheckCalculateFrequencyForWord(String wordToCheck) {
+        // execute
+        var result = wordCounterService.calculateFrequencyForWord("abc abc cba cba, 2", wordToCheck);
+
+        // verify
+        assertThat(result).isZero();
+    }
+
     @Test
     void calculateMostFrequentWords() {
         // prepare
