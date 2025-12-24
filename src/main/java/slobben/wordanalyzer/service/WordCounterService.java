@@ -16,8 +16,8 @@ public class WordCounterService implements WordFrequencyAnalyzer {
     @Override
     public int calculateHighestFrequency(String text) {
         return getWordFrequencies(text)
-                .max(Comparator.comparing(WordFrequency::getFrequency))
-                .map(WordFrequency::getFrequency)
+                .mapToInt(WordFrequency::getFrequency)
+                .max()
                 .orElse(0);
     }
 
@@ -25,7 +25,7 @@ public class WordCounterService implements WordFrequencyAnalyzer {
     public int calculateFrequencyForWord(String text, final String word) {
         return getWordFrequencies(text)
                 .filter(wordFrequency -> wordFrequency.getWord().equals(word))
-                .map(WordFrequency::getFrequency)
+                .mapToInt(WordFrequency::getFrequency)
                 .findFirst()
                 .orElse(0);
     }
