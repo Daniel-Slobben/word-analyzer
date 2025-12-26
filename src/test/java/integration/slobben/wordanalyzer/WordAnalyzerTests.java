@@ -25,13 +25,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = WordAnalyzerApplication.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)   // optional, lets us use constructor injection
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class WordAnalyzerTests {
-
     private static final String BASE_URL = "/text-processing";
     private static final String HIGHEST_FREQUENCY = "/highest-frequency";
     private static final String FREQUENCY_FOR_WORD = "/frequency-for-word/{word}";
     private static final String FREQUENCY_LIST = "/highest-frequency-list/{size}";
+
     private final RestTemplate restTemplate;
     @LocalServerPort
     private int port;
@@ -89,11 +89,12 @@ class WordAnalyzerTests {
 
     @Test
     void tooLargeInput() throws JacksonException {
-
+        // prepare
         var largeString = TestUtils.getStringOfLength(10_000_001);
         InputRequest payload = new InputRequest(largeString);
         HttpEntity<InputRequest> request = new HttpEntity<>(payload);
         var responseType = new ParameterizedTypeReference<List<WordFrequency>>() {};
+
         // execute and verify
         assertThatExceptionOfType(HttpClientErrorException.class).isThrownBy(() ->
                 restTemplate.exchange("http://localhost:" + port + BASE_URL + FREQUENCY_LIST,
