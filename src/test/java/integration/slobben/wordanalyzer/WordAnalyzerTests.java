@@ -1,5 +1,6 @@
 package integration.slobben.wordanalyzer;
 
+import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,15 +27,23 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = WordAnalyzerApplication.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@SuppressWarnings("java:S3008")
 class WordAnalyzerTests {
-    private static final String BASE_URL = "/text-processing";
-    private static final String HIGHEST_FREQUENCY = "/highest-frequency";
-    private static final String FREQUENCY_FOR_WORD = "/frequency-for-word/{word}";
-    private static final String FREQUENCY_LIST = "/highest-frequency-list/{size}";
+    private static String HIGHEST_FREQUENCY_URL;
+    private static String FREQUENCY_FOR_WORD_URL;
+    private static String FREQUENCY_LIST_URL;
 
     private final RestTemplate restTemplate;
     @LocalServerPort
     private int port;
+
+    @PostConstruct
+    void init() {
+        String url = "http://localhost:" + port + "/text-processing";
+        HIGHEST_FREQUENCY_URL = url + "/highest-frequency";
+        FREQUENCY_FOR_WORD_URL = url + "/frequency-for-word/{word}";
+        FREQUENCY_LIST_URL = url +  "/highest-frequency-list/{size}";
+    }
 
     public WordAnalyzerTests(@Autowired RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -47,7 +56,10 @@ class WordAnalyzerTests {
         HttpEntity<InputRequest> request = new HttpEntity<>(payload);
 
         // execute
-        ResponseEntity<Integer> response = restTemplate.exchange("http://localhost:" + port + BASE_URL + HIGHEST_FREQUENCY, HttpMethod.POST, request, Integer.class);
+        ResponseEntity<Integer> response = restTemplate.exchange(HIGHEST_FREQUENCY_URL,
+                HttpMethod.POST,
+                request,
+                Integer.class);
 
         // verify
         assertThat(response).isNotNull();
@@ -62,7 +74,11 @@ class WordAnalyzerTests {
         HttpEntity<InputRequest> request = new HttpEntity<>(payload);
 
         // execute
-        ResponseEntity<Integer> response = restTemplate.exchange("http://localhost:" + port + BASE_URL + FREQUENCY_FOR_WORD, HttpMethod.POST, request, Integer.class, "test");
+        ResponseEntity<Integer> response = restTemplate.exchange(FREQUENCY_FOR_WORD_URL,
+                HttpMethod.POST,
+                request,
+                Integer.class,
+                "test");
 
         // verify
         assertThat(response).isNotNull();
@@ -78,8 +94,11 @@ class WordAnalyzerTests {
         List<WordFrequencyDto> expectedList = List.of(new WordFrequencyDto("test", 2), new WordFrequencyDto("abc", 1));
 
         // execute
-        ResponseEntity<List<WordFrequencyDto>> response = restTemplate.exchange("http://localhost:" + port + BASE_URL + FREQUENCY_LIST, HttpMethod.POST, request, new ParameterizedTypeReference<>() {
-        }, "2");
+        ResponseEntity<List<WordFrequencyDto>> response = restTemplate.exchange(FREQUENCY_LIST_URL,
+                HttpMethod.POST,
+                request,
+                new ParameterizedTypeReference<>(){},
+                "2");
 
         // verify
         assertThat(response).isNotNull();
@@ -97,7 +116,7 @@ class WordAnalyzerTests {
 
         // execute and verify
         assertThatExceptionOfType(HttpClientErrorException.class).isThrownBy(() ->
-                restTemplate.exchange("http://localhost:" + port + BASE_URL + FREQUENCY_LIST,
+                restTemplate.exchange(FREQUENCY_LIST_URL,
                         HttpMethod.POST,
                         request,
                         responseType,
