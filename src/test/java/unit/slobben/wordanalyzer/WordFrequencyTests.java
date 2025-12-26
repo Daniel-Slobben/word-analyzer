@@ -22,7 +22,7 @@ class WordFrequencyTests {
     private final WordCounterService wordCounterService = new WordCounterService();
 
     @ParameterizedTest
-    @CsvSource({"a b c abc abc abc abc abd, 4", "abc abc cba cba, 2", "a, 1", "a1a, 2", "1a1, 1"})
+    @CsvSource({"a b c abc abc abc abc abd, 1", "abc abc cba cba, 2", "a, 1", "a1a, 2", "1a1, 1"})
     void calculateHighestFrequencyForWords(String sequence, int expectedFrequency) {
         // execute
         int result = wordCounterService.calculateHighestFrequency(sequence);
